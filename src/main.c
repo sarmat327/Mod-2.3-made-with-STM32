@@ -48,39 +48,50 @@ static void TIM2_Init(void)
     htim2.Instance               = TIM2;
     htim2.Init.Prescaler         = 16000 - 1;          /* 16 MHz / 16000 = 1 kHz (1 ms tick) */
     htim2.Init.CounterMode       = TIM_COUNTERMODE_UP;
-    htim2.Init.Period            = DEBOUNCE_MS - 1;    /* 50 ms */
+    htim2.Init.Period            = DEBOUNCE_MS - 1;    /* кожні 100 ms */
     htim2.Init.ClockDivision     = TIM_CLOCKDIVISION_DIV1;
     htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 
-    if (HAL_TIM_Base_Init(&htim2) != HAL_OK) {
-        Error_Handler();
-    }
-
+   
+    HAL_TIM_Base_Init(&htim2);
+    HAL_TIM_Base_Start_IT(&htim2);
     HAL_NVIC_SetPriority(TIM2_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(TIM2_IRQn);
+}
 
 void SysTick_Handler(void)
 {
     HAL_IncTick();
 }
 
-void EXTI9_5_IRQHandler(void)
+void TIM2_IRQHandler(void)
 {
-    HAL_GPIO_EXTI_IRQHandler(BTN_PIN);
+    HAL_TIM_IRQHandler(&htim2);
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim2)
 {
-    uint32_t now = HAL_GetTick();
-
-    if (GPIO_Pin == BTN_PIN)
+    if (htim2->Instance == TIM2)
     {
-        if (now - last_press > DEBOUNCE_MS)
-        {
-            last_press = now;
-            press = true;
-            LED_STATE_IS ++; 
+        TIM2_counter++; //значення від 1 до 10 використовуємо
+
+       switch (TIM2_counter)
+       {
+            case BLINK_R_TIME_MS:
+                HAL_GPIO_TogglePin(GPIOC, LED_R_PIN);
+            break;
+            
+            case BLINK_G_TIME_MS:
+                HAL_GPIO_TogglePin(GPIOC, LED_G_PIN);
+            break;
+            
+            case BLINK_W_TIME_MS:
+                HAL_GPIO_TogglePin(GPIOC, LED_W_PIN);
+            break;
+
         }
+        
+           if(TIM2_counter > 10) TIM2_counter = 0; 
     }
 }
 
