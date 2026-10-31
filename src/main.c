@@ -75,21 +75,30 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim2)
     {
         TIM2_counter++; //значення від 1 до 10 використовуємо
 
-       switch (TIM2_counter)
-       {
-            case BLINK_R_TIME_MS:
-                HAL_GPIO_TogglePin(GPIOC, LED_R_PIN);
-            break;
-            
-            case BLINK_G_TIME_MS:
-                HAL_GPIO_TogglePin(GPIOC, LED_G_PIN);
-            break;
-            
-            case BLINK_W_TIME_MS:
-                HAL_GPIO_TogglePin(GPIOC, LED_W_PIN);
-            break;
 
-        }
+        if(TIM2_counter % BLINK_R_TIME_MS == 0) HAL_GPIO_TogglePin(GPIOC, LED_R_PIN);
+        if(TIM2_counter % BLINK_G_TIME_MS == 0) HAL_GPIO_TogglePin(GPIOC, LED_G_PIN);
+        if(TIM2_counter % BLINK_W_TIME_MS == 0) HAL_GPIO_TogglePin(GPIOC, LED_W_PIN);
+
+
+//    // Варіант на основі SWITCH-CASE НЕ ВІРНА ЛОГІКА ((
+//        switch (TIM2_counter)
+//        {
+//             case (BLINK_R_TIME_MS):
+//                 HAL_GPIO_TogglePin(GPIOC, LED_R_PIN);
+//             break;
+            
+//             case BLINK_G_TIME_MS:
+//                 HAL_GPIO_TogglePin(GPIOC, LED_G_PIN);
+//             break;
+            
+//             case BLINK_W_TIME_MS:
+//                 HAL_GPIO_TogglePin(GPIOC, LED_W_PIN);
+//             break;
+
+          //HAL_GPIO_TogglePin(GPIOC, LED_W_PIN);
+            
+        
         
            if(TIM2_counter > 10) TIM2_counter = 0; 
     }
